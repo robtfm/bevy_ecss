@@ -28,6 +28,10 @@ pub enum PropertyToken {
     ///
     /// Currently there is no distinction between [`length-values`](https://developer.mozilla.org/en-US/docs/Web/CSS/length).
     Dimension(f32),
+    VMin(f32),
+    VMax(f32),
+    Vh(f32),
+    Vw(f32),
     /// A numeric float value, like `31.1` or `43`.
     Number(f32),
     /// A plain identifier, like `none` or `center`.
@@ -97,6 +101,8 @@ impl PropertyValues {
         self.0.iter().find_map(|token| match token {
             PropertyToken::Percentage(val) => Some(Val::Percent(*val)),
             PropertyToken::Dimension(val) => Some(Val::Px(*val)),
+            PropertyToken::VMin(val) => Some(Val::VMin(*val)),
+            PropertyToken::VMax(val) => Some(Val::VMax(*val)),
             PropertyToken::Identifier(val) if val == "auto" => Some(Val::Auto),
             _ => None,
         })
@@ -153,6 +159,8 @@ impl PropertyValues {
                     let val = match token {
                         PropertyToken::Percentage(val) => Val::Percent(*val),
                         PropertyToken::Dimension(val) => Val::Px(*val),
+                        PropertyToken::VMin(val) => Val::VMin(*val),
+                        PropertyToken::VMax(val) => Val::VMax(*val),
                         PropertyToken::Identifier(val) if val == "auto" => Val::Auto,
                         _ => return (rect, idx),
                     };
@@ -183,7 +191,13 @@ impl<'i> TryFrom<Token<'i>> for PropertyToken {
             Token::QuotedString(val) => Ok(Self::String(val.to_string())),
             Token::Number { value, .. } => Ok(Self::Number(value)),
             Token::Percentage { unit_value, .. } => Ok(Self::Percentage(unit_value * 100.0)),
-            Token::Dimension { value, .. } => Ok(Self::Dimension(value)),
+            Token::Dimension { value, unit, .. } => match unit.as_bytes() {
+                b"vmin" => Ok(Self::VMin(value)),
+                b"vmax" => Ok(Self::VMax(value)),
+                b"vh" => Ok(Self::Vh(value)),
+                b"vw" => Ok(Self::Vw(value)),
+                _ => Ok(Self::Dimension(value)),
+            },
             _ => Err(()),
         }
     }
