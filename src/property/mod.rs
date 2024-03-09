@@ -103,6 +103,8 @@ impl PropertyValues {
             PropertyToken::Dimension(val) => Some(Val::Px(*val)),
             PropertyToken::VMin(val) => Some(Val::VMin(*val)),
             PropertyToken::VMax(val) => Some(Val::VMax(*val)),
+            PropertyToken::Vh(val) => Some(Val::Vh(*val)),
+            PropertyToken::Vw(val) => Some(Val::Vw(*val)),
             PropertyToken::Identifier(val) if val == "auto" => Some(Val::Auto),
             _ => None,
         })
@@ -161,6 +163,8 @@ impl PropertyValues {
                         PropertyToken::Dimension(val) => Val::Px(*val),
                         PropertyToken::VMin(val) => Val::VMin(*val),
                         PropertyToken::VMax(val) => Val::VMax(*val),
+                        PropertyToken::Vw(val) => Val::Vw(*val),
+                        PropertyToken::Vh(val) => Val::Vh(*val),
                         PropertyToken::Identifier(val) if val == "auto" => Val::Auto,
                         _ => return (rect, idx),
                     };
