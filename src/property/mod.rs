@@ -300,14 +300,14 @@ impl StyleSheetState {
 /// - [`Filters`](Property::Filters) is used to filter which entities will be applied the property modification.
 ///   Entities are first filtered by [`selectors`](`Selector`), but it can be useful to also ensure some behavior for safety reasons,
 ///   like only inserting [`JustifyText`](bevy::prelude::JustifyText) if the entity also has a [`Text`](bevy::prelude::Text) component.
-/// 
+///
 /// Check [`WorldQuery`] for more.
 ///
 /// These are tree functions required to be implemented:
 /// - [`name`](Property::name) indicates which property name should matched for.
 /// - [`parse`](Property::parse) parses the [`PropertyValues`] into the [`Cache`](Property::Cache) value to be reused across multiple entities.
 /// - [`apply`](Property::apply) applies on the given [`Components`](Property::Components) the [`Cache`](Property::Cache) value.
-/// 
+///
 /// Additionally, an [`AssetServer`] and [`Commands`] parameters are provided for more complex use cases.
 ///
 /// Also, there one function which have default implementations:
