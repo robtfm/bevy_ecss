@@ -1,10 +1,12 @@
 use std::hash::{Hash, Hasher};
 
+use ahash::AHasher;
 use bevy::{
-    asset::{io::Reader, AssetLoader, AsyncReadExt},
+    asset::{io::Reader, AssetLoader},
+    platform::collections::HashMap,
     prelude::Asset,
     reflect::TypePath,
-    utils::{AHasher, ConditionalSendFuture, HashMap},
+    tasks::ConditionalSendFuture,
 };
 use smallvec::SmallVec;
 use thiserror::Error;
@@ -93,11 +95,11 @@ impl AssetLoader for StyleSheetLoader {
     type Settings = ();
     type Error = StyleSheetLoaderError;
 
-    fn load<'a>(
-        &'a self,
-        reader: &'a mut Reader,
-        _settings: &'a Self::Settings,
-        load_context: &'a mut bevy::asset::LoadContext,
+    fn load(
+        &self,
+        reader: &mut dyn Reader,
+        _settings: &Self::Settings,
+        load_context: &mut bevy::asset::LoadContext,
     ) -> impl ConditionalSendFuture<Output = Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
             let mut bytes = Vec::new();

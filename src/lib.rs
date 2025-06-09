@@ -12,13 +12,14 @@ use std::{error::Error, fmt::Display};
 use bevy::{
     app::First,
     asset::AssetEvents,
-    ecs::system::SystemState,
+    ecs::{schedule::IntoScheduleConfigs, system::SystemState},
     prelude::{
-        AssetApp, Button, Component, Entity, IntoSystemConfigs, IntoSystemSetConfigs, Plugin,
-        PostUpdate, PreUpdate, Query, SystemSet, With,
+        AssetApp, Button, Component, Entity, Plugin, PostUpdate, PreUpdate, Query, SystemSet, With,
     },
-    text::Text,
-    ui::{BackgroundColor, Interaction, Node, Style, UiImage},
+    ui::{
+        widget::{ImageNode, Text},
+        BackgroundColor, ComputedNode, Interaction, Node,
+    },
 };
 
 use property::StyleSheetState;
@@ -141,9 +142,9 @@ fn register_component_selector(app: &mut bevy::prelude::App) {
     app.register_component_selector::<BackgroundColor>("background-color");
     app.register_component_selector::<Text>("text");
     app.register_component_selector::<Button>("button");
-    app.register_component_selector::<Node>("node");
-    app.register_component_selector::<Style>("style");
-    app.register_component_selector::<UiImage>("ui-image");
+    app.register_component_selector::<ComputedNode>("node");
+    app.register_component_selector::<Node>("style");
+    app.register_component_selector::<ImageNode>("ui-image");
     app.register_component_selector::<Interaction>("interaction");
 }
 
@@ -152,7 +153,6 @@ fn register_properties(app: &mut bevy::prelude::App) {
 
     app.register_property::<DisplayProperty>();
     app.register_property::<PositionTypeProperty>();
-    app.register_property::<DirectionProperty>();
     app.register_property::<FlexDirectionProperty>();
     app.register_property::<FlexWrapProperty>();
     app.register_property::<AlignItemsProperty>();

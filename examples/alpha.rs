@@ -19,23 +19,22 @@ fn main() {
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d::default());
 
     commands
-        .spawn(NodeBundle {
-            style: Style {
+        .spawn((
+            Node {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 justify_content: JustifyContent::SpaceBetween,
                 ..default()
             },
-            background_color: Color::NONE.into(),
-            ..default()
-        })
+            BackgroundColor::from(Color::NONE),
+        ))
         .insert(StyleSheet::new(asset_server.load("sheets/alpha.css")))
         .with_children(|parent| {
             // bevy logo (image)
-            parent.spawn(ImageBundle::default());
+            parent.spawn(ImageNode::default());
         });
 }
 
@@ -70,6 +69,7 @@ impl Property for AlphaProperty {
         cache: &Self::Cache,
         mut components: QueryItem<Self::Components>,
         _asset_server: &AssetServer,
+        _: &mut TextUiWriter,
         _commands: &mut Commands,
     ) {
         components.0.set_alpha(*cache);

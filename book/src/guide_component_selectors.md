@@ -9,7 +9,7 @@ Bevy ECSS provites the following components selector:
 |      `button`      |          [`Button`](https://docs.rs/bevy/latest/bevy/prelude/struct.Button.html)          |
 |       `node`       |            [`Node`](https://docs.rs/bevy/latest/bevy/prelude/struct.Node.html)            |
 |      `style`       |           [`Style`](https://docs.rs/bevy/latest/bevy/prelude/struct.Style.html)           |
-|     `ui-image`     |         [`UiImage`](https://docs.rs/bevy/latest/bevy/prelude/struct.UiImage.html)         |
+|     `ui-image`     |         [`ImageNode`](https://docs.rs/bevy/latest/bevy/prelude/struct.ImageNode.html)         |
 |   `interaction`    |      [`Interaction`](https://docs.rs/bevy/latest/bevy/prelude/enum.Interaction.html)      |
 
 This list will be expanded to match `bevy_ui` and other `bevy` core components.

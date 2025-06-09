@@ -1,3 +1,4 @@
+/*
 use bevy::{color::palettes::basic, prelude::*};
 use bevy_ecss::prelude::{Class, EcssPlugin, StyleSheet};
 
@@ -24,7 +25,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // root node
     commands
         .spawn(NodeBundle {
-            style: Style {
+            style: Node {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 justify_content: JustifyContent::SpaceBetween,
@@ -39,7 +40,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             // left vertical fill (border)
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         width: Val::Px(200.0),
                         height: Val::Percent(100.0),
                         border: UiRect::all(Val::Px(2.0)),
@@ -53,7 +54,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     // left vertical fill (content)
                     parent
                         .spawn(NodeBundle {
-                            style: Style {
+                            style: Node {
                                 width: Val::Percent(100.0),
                                 height: Val::Percent(100.0),
                                 align_items: AlignItems::FlexEnd,
@@ -75,7 +76,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                             color: Color::WHITE,
                                         },
                                     )
-                                    .with_style(Style {
+                                    .with_style(Node {
                                         margin: UiRect::all(Val::Px(5.0)),
                                         ..default()
                                     }),
@@ -86,7 +87,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             // right vertical fill
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         flex_direction: FlexDirection::ColumnReverse,
                         justify_content: JustifyContent::Center,
                         width: Val::Px(200.0),
@@ -109,7 +110,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                     color: Color::WHITE,
                                 },
                             )
-                            .with_style(Style {
+                            .with_style(Node {
                                 height: Val::Px(25.0),
                                 margin: UiRect {
                                     left: Val::Auto,
@@ -123,7 +124,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     // List with hidden overflow
                     parent
                         .spawn(NodeBundle {
-                            style: Style {
+                            style: Node {
                                 flex_direction: FlexDirection::ColumnReverse,
                                 align_self: AlignSelf::Center,
                                 width: Val::Percent(100.0),
@@ -139,7 +140,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                             // Moving panel
                             parent
                                 .spawn(NodeBundle {
-                                    style: Style {
+                                    style: Node {
                                         flex_direction: FlexDirection::ColumnReverse,
                                         flex_grow: 1.0,
                                         ..default()
@@ -162,7 +163,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                                         color: Color::WHITE,
                                                     },
                                                 )
-                                                .with_style(Style {
+                                                .with_style(Node {
                                                     flex_shrink: 0.,
                                                     height: Val::Px(20.0),
                                                     margin: UiRect {
@@ -182,7 +183,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             // absolute positioning
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         width: Val::Px(200.0),
                         height: Val::Px(200.0),
                         position_type: PositionType::Absolute,
@@ -198,7 +199,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .with_children(|parent| {
                     parent
                         .spawn(NodeBundle {
-                            style: Style {
+                            style: Node {
                                 width: Val::Percent(100.0),
                                 height: Val::Percent(100.0),
                                 ..default()
@@ -211,7 +212,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             // render order test: reddest in the back, whitest in the front (flex center)
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         width: Val::Percent(100.0),
                         height: Val::Percent(100.0),
                         position_type: PositionType::Absolute,
@@ -227,7 +228,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .with_children(|parent| {
                     parent
                         .spawn(NodeBundle {
-                            style: Style {
+                            style: Node {
                                 width: Val::Px(100.0),
                                 height: Val::Px(100.0),
                                 ..default()
@@ -239,7 +240,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         .with_children(|parent| {
                             parent
                                 .spawn(NodeBundle {
-                                    style: Style {
+                                    style: Node {
                                         width: Val::Px(100.0),
                                         height: Val::Px(100.0),
                                         position_type: PositionType::Absolute,
@@ -253,7 +254,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                 .insert(Name::new("mid-red-center"));
                             parent
                                 .spawn(NodeBundle {
-                                    style: Style {
+                                    style: Node {
                                         width: Val::Px(100.0),
                                         height: Val::Px(100.0),
                                         position_type: PositionType::Absolute,
@@ -268,7 +269,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                 .insert(Name::new("mid-red-top-but-one"));
                             parent
                                 .spawn(NodeBundle {
-                                    style: Style {
+                                    style: Node {
                                         width: Val::Px(100.0),
                                         height: Val::Px(100.0),
                                         position_type: PositionType::Absolute,
@@ -283,7 +284,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                             // alpha test
                             parent
                                 .spawn(NodeBundle {
-                                    style: Style {
+                                    style: Node {
                                         width: Val::Px(100.0),
                                         height: Val::Px(100.0),
                                         position_type: PositionType::Absolute,
@@ -301,7 +302,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             // bevy logo (flex center)
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         width: Val::Percent(100.0),
                         height: Val::Percent(100.0),
                         position_type: PositionType::Absolute,
@@ -317,7 +318,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     // bevy logo (image)
                     parent
                         .spawn(ImageBundle {
-                            style: Style {
+                            style: Node {
                                 width: Val::Px(500.0),
                                 ..default()
                             },
@@ -328,3 +329,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 });
         });
 }
+*/
+
+fn main() {}

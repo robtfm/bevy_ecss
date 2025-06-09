@@ -4,12 +4,12 @@ use bevy::{
         system::{SystemParam, SystemState},
     },
     log::{debug, error, trace},
+    platform::collections::HashMap,
     prelude::{
         AssetEvent, AssetId, Assets, Changed, Children, Component, Deref, DerefMut, Entity,
         EventReader, Mut, Name, Query, Res, ResMut, Resource, With, World,
     },
-    ui::{Interaction, Node},
-    utils::HashMap,
+    ui::{ComputedNode, Interaction},
 };
 use smallvec::SmallVec;
 
@@ -38,6 +38,7 @@ impl<'w, 's, T: Component> ComponentFilter for SystemState<Query<'w, 's, Entity,
     fn get_change_ticks(&self, world: &World, entity: Entity) -> Option<ComponentTicks> {
         world
             .get_entity(entity)
+            .ok()
             .and_then(|e| e.get_change_ticks::<T>())
     }
 }
@@ -60,8 +61,8 @@ pub(crate) struct CssQueryParam<'w, 's> {
     >,
     names: Query<'w, 's, (Entity, &'static Name)>,
     classes: Query<'w, 's, (Entity, &'static Class)>,
-    children: Query<'w, 's, &'static Children, With<Node>>,
-    any: Query<'w, 's, Entity, With<Node>>,
+    children: Query<'w, 's, &'static Children, With<ComputedNode>>,
+    any: Query<'w, 's, Entity, With<ComputedNode>>,
 }
 
 /// Holds an previous prepared [`CssQueryParam`];
@@ -299,6 +300,7 @@ fn get_entities_with_pseudo_class_interaction(
         .filter(|&e| {
             world
                 .get_entity(e)
+                .ok()
                 .and_then(|e| e.get::<Interaction>())
                 .is_some_and(|i| i == interaction)
         })
@@ -336,7 +338,7 @@ fn get_entities_with_component(
 /// Filters entities which have a [`Node`] component.
 /// This is to mimic the "*" selector on CSS.
 fn get_entities_with_any_component(
-    query: &Query<Entity, With<Node>>,
+    query: &Query<Entity, With<ComputedNode>>,
     entities: SmallVec<[Entity; 8]>,
 ) -> (FilteredEntities, MatchedEntities) {
     let filtered = query
@@ -353,7 +355,7 @@ fn get_entities_with_any_component(
 /// Traverse the children hierarchy three and returns all entities.
 fn get_children_recursively(
     children: &Children,
-    q_childs: &Query<&Children, With<Node>>,
+    q_childs: &Query<&Children, With<ComputedNode>>,
 ) -> SmallVec<[Entity; 8]> {
     children
         .iter()
@@ -445,7 +447,7 @@ fn check_for_changed_assets(
                 SelectorElement::PseudoClass(pseudo_class) => {
                     any_component_changed_by_pseudo_class(world, entities, *pseudo_class)
                 }
-                SelectorElement::Any => any_component::<Node>(world, entities),
+                SelectorElement::Any => any_component::<ComputedNode>(world, entities),
                 _ => unreachable!(),
             };
 
@@ -465,7 +467,11 @@ fn any_component<T: Component>(world: &World, entities: &SmallVec<[Entity; 8]>) 
     let this_run = world.read_change_tick();
     let last_run = world.last_change_tick();
     for e in entities {
-        if let Some(ticks) = world.get_entity(*e).and_then(|e| e.get_change_ticks::<T>()) {
+        if let Some(ticks) = world
+            .get_entity(*e)
+            .ok()
+            .and_then(|e| e.get_change_ticks::<T>())
+        {
             if ticks.is_changed(last_run, this_run) {
                 return true;
             }

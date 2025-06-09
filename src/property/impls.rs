@@ -24,8 +24,8 @@ mod style {
 
             impl Property for $struct {
                 type Cache = UiRect;
-                type Components = &'static mut Style;
-                type Filters = With<Node>;
+                type Components = &'static mut Node;
+                type Filters = With<ComputedNode>;
 
                 fn name() -> &'static str {
                     $name
@@ -43,6 +43,7 @@ mod style {
                     cache: &Self::Cache,
                     mut components: QueryItem<Self::Components>,
                     _asset_server: &AssetServer,
+                    _writer: &mut TextUiWriter,
                     _commands: &mut Commands,
                 ) {
                     components.$style_prop$(.$style_field)? = *cache;
@@ -69,8 +70,8 @@ mod style {
 
             impl Property for $struct {
                 type Cache = $cache;
-                type Components = &'static mut Style;
-                type Filters = With<Node>;
+                type Components = &'static mut Node;
+                type Filters = With<ComputedNode>;
 
                 fn name() -> &'static str {
                     $name
@@ -88,6 +89,7 @@ mod style {
                     cache: &Self::Cache,
                     mut components: QueryItem<Self::Components>,
                     _asset_server: &AssetServer,
+                    _writer: &mut TextUiWriter,
                     _commands: &mut Commands,
                 ) {
                     components.$style_prop$(.$style_field)? = *cache;
@@ -142,8 +144,8 @@ mod style {
 
             impl Property for $struct {
                 type Cache = $cache;
-                type Components = &'static mut Style;
-                type Filters = With<Node>;
+                type Components = &'static mut Node;
+                type Filters = With<ComputedNode>;
 
                 fn name() -> &'static str {
                     $name
@@ -167,6 +169,7 @@ mod style {
                     cache: &Self::Cache,
                     mut components: QueryItem<Self::Components>,
                     _asset_server: &AssetServer,
+                    _writer: &mut TextUiWriter,
                     _commands: &mut Commands,
                 ) {
                     components.$style_prop$(.$style_field)? = *cache;
@@ -183,12 +186,6 @@ mod style {
     impl_style_enum!(PositionType, "position-type", PositionTypeProperty, position_type,
         "absolute" => Absolute,
         "relative" => Relative,
-    );
-
-    impl_style_enum!(Direction, "direction", DirectionProperty, direction,
-        "inherit" => Inherit,
-        "left-to-right" => LeftToRight,
-        "right-to-left" => RightToLeft,
     );
 
     impl_style_enum!(FlexDirection, "flex-direction", FlexDirectionProperty, flex_direction,
@@ -260,8 +257,8 @@ mod text {
 
     impl Property for FontColorProperty {
         type Cache = Color;
-        type Components = &'static mut Text;
-        type Filters = With<Node>;
+        type Components = Entity;
+        type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
             "color"
@@ -277,14 +274,12 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            mut components: QueryItem<Self::Components>,
+            components: QueryItem<Self::Components>,
             _asset_server: &AssetServer,
+            writer: &mut TextUiWriter,
             _commands: &mut Commands,
         ) {
-            components
-                .sections
-                .iter_mut()
-                .for_each(|section| section.style.color = *cache);
+            writer.for_each_color(components, |mut c| c.0 = *cache);
         }
     }
 
@@ -294,8 +289,8 @@ mod text {
 
     impl Property for FontProperty {
         type Cache = String;
-        type Components = &'static mut Text;
-        type Filters = With<Node>;
+        type Components = Entity;
+        type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
             "font"
@@ -311,14 +306,12 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            mut components: QueryItem<Self::Components>,
+            components: QueryItem<Self::Components>,
             asset_server: &AssetServer,
+            writer: &mut TextUiWriter,
             _commands: &mut Commands,
         ) {
-            components
-                .sections
-                .iter_mut()
-                .for_each(|section| section.style.font = asset_server.load(cache));
+            writer.for_each_font(components, |mut f| f.font = asset_server.load(cache));
         }
     }
 
@@ -328,8 +321,8 @@ mod text {
 
     impl Property for FontSizeProperty {
         type Cache = f32;
-        type Components = &'static mut Text;
-        type Filters = With<Node>;
+        type Components = Entity;
+        type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
             "font-size"
@@ -345,14 +338,12 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            mut components: QueryItem<Self::Components>,
+            components: QueryItem<Self::Components>,
             _asset_server: &AssetServer,
+            writer: &mut TextUiWriter,
             _commands: &mut Commands,
         ) {
-            components
-                .sections
-                .iter_mut()
-                .for_each(|section| section.style.font_size = *cache);
+            writer.for_each_font(components, |mut f| f.font_size = *cache);
         }
     }
 
@@ -363,8 +354,8 @@ mod text {
     impl Property for TextAlignProperty {
         // Using Option since Cache must impl Default, which  doesn't
         type Cache = Option<JustifyText>;
-        type Components = &'static mut Text;
-        type Filters = With<Node>;
+        type Components = &'static mut TextLayout;
+        type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
             "text-align"
@@ -386,6 +377,7 @@ mod text {
             cache: &Self::Cache,
             mut components: QueryItem<Self::Components>,
             _asset_server: &AssetServer,
+            _writer: &mut TextUiWriter,
             _commands: &mut Commands,
         ) {
             components.justify = cache.expect("Should always have a inner value");
@@ -398,8 +390,8 @@ mod text {
 
     impl Property for TextContentProperty {
         type Cache = String;
-        type Components = &'static mut Text;
-        type Filters = With<Node>;
+        type Components = Entity;
+        type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
             "text-content"
@@ -415,15 +407,14 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            mut components: QueryItem<Self::Components>,
+            components: QueryItem<Self::Components>,
             _asset_server: &AssetServer,
+            writer: &mut TextUiWriter,
             _commands: &mut Commands,
         ) {
-            components
-                .sections
-                .iter_mut()
-                // TODO: Maybe change this so each line break is a new section
-                .for_each(|section| section.value.clone_from(cache));
+            writer.for_each_text(components, |mut s| {
+                s.clone_from(cache);
+            });
         }
     }
 }
@@ -453,6 +444,7 @@ impl Property for BackgroundColorProperty {
         cache: &Self::Cache,
         components: QueryItem<Self::Components>,
         _asset_server: &AssetServer,
+        _writer: &mut TextUiWriter,
         commands: &mut Commands,
     ) {
         commands.entity(components).insert(BackgroundColor(*cache));
@@ -484,20 +476,21 @@ impl Property for BorderColorProperty {
         cache: &Self::Cache,
         components: QueryItem<Self::Components>,
         _asset_server: &AssetServer,
+        _writer: &mut TextUiWriter,
         commands: &mut Commands,
     ) {
-        commands.entity(components).insert(BorderColor::all(*cache));
+        commands.entity(components).insert(BorderColor(*cache));
     }
 }
 
-/// Applies the `image-path` property on [`bevy::ui::UiImage`] texture property of all sections on matched [`bevy::ui::UiImage`] components.
+/// Applies the `image-path` property on [`bevy::ui::ImageNode`] texture property of all sections on matched [`bevy::ui::ImageNode`] components.
 #[derive(Default)]
 pub struct ImageProperty;
 
 impl Property for ImageProperty {
     type Cache = String;
-    type Components = &'static mut UiImage;
-    type Filters = With<Node>;
+    type Components = &'static mut ImageNode;
+    type Filters = With<ComputedNode>;
 
     fn name() -> &'static str {
         "image-path"
@@ -515,8 +508,9 @@ impl Property for ImageProperty {
         cache: &Self::Cache,
         mut components: QueryItem<Self::Components>,
         asset_server: &AssetServer,
+        _writer: &mut TextUiWriter,
         _commands: &mut Commands,
     ) {
-        components.texture = asset_server.load(cache);
+        components.image = asset_server.load(cache);
     }
 }

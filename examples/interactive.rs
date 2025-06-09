@@ -19,39 +19,27 @@ fn main() {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Camera
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d::default());
 
     // root node
     commands
-        .spawn(NodeBundle {
-            focus_policy: FocusPolicy::Pass,
-            ..default()
-        })
+        .spawn((Node::default(), FocusPolicy::Pass))
         .insert(Name::new("ui-root"))
         .insert(StyleSheet::new(asset_server.load("sheets/interactive.css")))
         .with_children(|parent| {
             parent
-                .spawn(NodeBundle {
-                    focus_policy: FocusPolicy::Pass,
-                    ..default()
-                })
+                .spawn((Node::default(), FocusPolicy::Pass))
                 .insert(Name::new("list"))
                 .with_children(|parent| {
                     // Moving panel
                     parent
-                        .spawn(NodeBundle {
-                            focus_policy: FocusPolicy::Pass,
-                            ..default()
-                        })
+                        .spawn((Node::default(), FocusPolicy::Pass))
                         .insert(Name::new("panel"))
                         .with_children(|parent| {
                             // List items
                             for i in 0..30 {
                                 parent
-                                    .spawn(TextBundle::from_section(
-                                        format!("Item {i}"),
-                                        TextStyle::default(),
-                                    ))
+                                    .spawn(Text::new(format!("Item {i}")))
                                     .insert(Interaction::default());
                             }
                         });

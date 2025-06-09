@@ -1,6 +1,6 @@
 use std::hash::{Hash, Hasher};
 
-use bevy::utils::AHasher;
+use ahash::AHasher;
 use cssparser::CowRcStr;
 use smallvec::{smallvec, SmallVec};
 

@@ -73,4 +73,4 @@ _Before reading properties description, we'll use this notation to describe acce
 
 |   Property   |       Values       | Description                                                                                                                                                                                                                          |
 |:------------:|:------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `image-path` | "path/to/image.png" | Applies the property on [`image.texture`](https://docs.rs/bevy/latest/bevy/prelude/struct.UiImage.html#structfield.texture) for all [`images`](https://docs.rs/bevy/latest/bevy/ui/struct.UiImage.html) of matched components. |
+| `image-path` | "path/to/image.png" | Applies the property on [`image.texture`](https://docs.rs/bevy/latest/bevy/prelude/struct.ImageNode.html#structfield.texture) for all [`images`](https://docs.rs/bevy/latest/bevy/ui/struct.ImageNode.html) of matched components. |

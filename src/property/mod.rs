@@ -3,12 +3,12 @@ use std::any::Any;
 use bevy::{
     ecs::query::{QueryData, QueryFilter, QueryItem},
     log::{error, trace},
+    platform::collections::HashMap,
     prelude::{
         AssetId, AssetServer, Assets, Color, Commands, Deref, DerefMut, Entity, Local, Query, Res,
         Resource,
     },
-    ui::{UiRect, Val},
-    utils::HashMap,
+    ui::{widget::TextUiWriter, UiRect, Val},
 };
 
 use cssparser::Token;
@@ -340,6 +340,7 @@ pub trait Property: Default + Sized + Send + Sync + 'static {
         cache: &Self::Cache,
         components: QueryItem<Self::Components>,
         asset_server: &AssetServer,
+        text_writer: &mut TextUiWriter,
         commands: &mut Commands,
     );
 
@@ -354,6 +355,7 @@ pub trait Property: Default + Sized + Send + Sync + 'static {
         mut q_nodes: Query<Self::Components, Self::Filters>,
         asset_server: Res<AssetServer>,
         mut commands: Commands,
+        mut writer: TextUiWriter,
     ) {
         for (asset_id, _, selected) in apply_sheets.iter() {
             if let Some(rules) = assets.get(*asset_id) {
@@ -367,7 +369,13 @@ pub trait Property: Default + Sized + Send + Sync + 'static {
                         );
                         for entity in entities {
                             if let Ok(components) = q_nodes.get_mut(*entity) {
-                                Self::apply(cached, components, &asset_server, &mut commands);
+                                Self::apply(
+                                    cached,
+                                    components,
+                                    &asset_server,
+                                    &mut writer,
+                                    &mut commands,
+                                );
                             }
                         }
                     }

@@ -12,7 +12,9 @@ repository = "https://github.com/afonsolage/bevy_ecss"
 
 [dependencies]
 
-bevy = { git = "https://github.com/robtfm/bevy", branch = "release-0.14-dcl-cosmic-noimage", default-features = false, features = [
+bevy = { path = "../bevy", default-features = false, features = [
+    "std",
+    "bevy_log",
     "bevy_ui",
     "bevy_asset",
     "bevy_text",
@@ -22,18 +24,22 @@ cssparser = "0.33"
 cssparser-color = "0.1"
 smallvec = { version = "1.11", features = ["serde", "union", "const_generics"] }
 thiserror = "1.0.50"
+ahash = "*"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
-bevy = { git = "https://github.com/robtfm/bevy", branch = "release-0.14-dcl-cosmic-noimage", features = [
+bevy = { path = "../bevy", default-features = false, features = [
+    "std",
+    "bevy_log",
     "bevy_ui",
     "bevy_asset",
     "bevy_text",
     "bevy_render",
+    "bevy_window",
+    "bevy_winit",
+    "multi_threaded",
     "file_watcher",
+    "png",
 ] }
-
-[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
-bevy = { git = "https://github.com/robtfm/bevy", branch = "release-0.14-dcl-cosmic-noimage" }
 
 [[example]]
 name = "simple_ui"
