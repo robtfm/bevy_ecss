@@ -43,7 +43,6 @@ mod style {
                     cache: &Self::Cache,
                     mut components: QueryItem<Self::Components>,
                     _asset_server: &AssetServer,
-                    _writer: &mut TextUiWriter,
                     _commands: &mut Commands,
                 ) {
                     components.$style_prop$(.$style_field)? = *cache;
@@ -89,7 +88,6 @@ mod style {
                     cache: &Self::Cache,
                     mut components: QueryItem<Self::Components>,
                     _asset_server: &AssetServer,
-                    _writer: &mut TextUiWriter,
                     _commands: &mut Commands,
                 ) {
                     components.$style_prop$(.$style_field)? = *cache;
@@ -169,7 +167,6 @@ mod style {
                     cache: &Self::Cache,
                     mut components: QueryItem<Self::Components>,
                     _asset_server: &AssetServer,
-                    _writer: &mut TextUiWriter,
                     _commands: &mut Commands,
                 ) {
                     components.$style_prop$(.$style_field)? = *cache;
@@ -249,6 +246,8 @@ mod style {
 
 /// Impls for `bevy_text` [`Text`] component
 mod text {
+    use bevy::app::Propagate;
+
     use super::*;
 
     /// Applies the `color` property on [`TextStyle::color`](`TextStyle`) field of all sections on matched [`Text`] components.
@@ -274,12 +273,11 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            components: QueryItem<Self::Components>,
+            entity: QueryItem<Self::Components>,
             _asset_server: &AssetServer,
-            writer: &mut TextUiWriter,
-            _commands: &mut Commands,
+            commands: &mut Commands,
         ) {
-            writer.for_each_color(components, |mut c| c.0 = *cache);
+            commands.entity(entity).try_insert(Propagate(TextColor(*cache)));
         }
     }
 
@@ -289,7 +287,7 @@ mod text {
 
     impl Property for FontProperty {
         type Cache = String;
-        type Components = Entity;
+        type Components = (Entity, &'static TextFont);
         type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
@@ -306,12 +304,11 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            components: QueryItem<Self::Components>,
+            (entity, font): QueryItem<Self::Components>,
             asset_server: &AssetServer,
-            writer: &mut TextUiWriter,
-            _commands: &mut Commands,
+            commands: &mut Commands,
         ) {
-            writer.for_each_font(components, |mut f| f.font = asset_server.load(cache));
+            commands.entity(entity).try_insert(Propagate(font.clone().with_font(asset_server.load(cache))));
         }
     }
 
@@ -321,7 +318,7 @@ mod text {
 
     impl Property for FontSizeProperty {
         type Cache = f32;
-        type Components = Entity;
+        type Components = (Entity, &'static TextFont);
         type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
@@ -338,12 +335,11 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            components: QueryItem<Self::Components>,
+            (entity, font): QueryItem<Self::Components>,
             _asset_server: &AssetServer,
-            writer: &mut TextUiWriter,
-            _commands: &mut Commands,
+            commands: &mut Commands,
         ) {
-            writer.for_each_font(components, |mut f| f.font_size = *cache);
+            commands.entity(entity).try_insert(Propagate(font.clone().with_font_size(*cache)));
         }
     }
 
@@ -377,7 +373,6 @@ mod text {
             cache: &Self::Cache,
             mut components: QueryItem<Self::Components>,
             _asset_server: &AssetServer,
-            _writer: &mut TextUiWriter,
             _commands: &mut Commands,
         ) {
             components.justify = cache.expect("Should always have a inner value");
@@ -390,7 +385,7 @@ mod text {
 
     impl Property for TextContentProperty {
         type Cache = String;
-        type Components = Entity;
+        type Components = &'static mut Text;
         type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
@@ -407,14 +402,11 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            components: QueryItem<Self::Components>,
+            mut component: QueryItem<Self::Components>,
             _asset_server: &AssetServer,
-            writer: &mut TextUiWriter,
             _commands: &mut Commands,
         ) {
-            writer.for_each_text(components, |mut s| {
-                s.clone_from(cache);
-            });
+            component.0.clone_from(cache);
         }
     }
 }
@@ -444,7 +436,6 @@ impl Property for BackgroundColorProperty {
         cache: &Self::Cache,
         components: QueryItem<Self::Components>,
         _asset_server: &AssetServer,
-        _writer: &mut TextUiWriter,
         commands: &mut Commands,
     ) {
         commands.entity(components).insert(BackgroundColor(*cache));
@@ -476,7 +467,6 @@ impl Property for BorderColorProperty {
         cache: &Self::Cache,
         components: QueryItem<Self::Components>,
         _asset_server: &AssetServer,
-        _writer: &mut TextUiWriter,
         commands: &mut Commands,
     ) {
         commands.entity(components).insert(BorderColor(*cache));
@@ -508,7 +498,6 @@ impl Property for ImageProperty {
         cache: &Self::Cache,
         mut components: QueryItem<Self::Components>,
         asset_server: &AssetServer,
-        _writer: &mut TextUiWriter,
         _commands: &mut Commands,
     ) {
         components.image = asset_server.load(cache);

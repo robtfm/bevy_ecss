@@ -10,16 +10,12 @@ mod system;
 use std::{error::Error, fmt::Display};
 
 use bevy::{
-    app::First,
-    asset::AssetEvents,
-    ecs::{schedule::IntoScheduleConfigs, system::SystemState},
-    prelude::{
+    app::{First, HierarchyPropagatePlugin}, asset::AssetEvents, ecs::{query::Or, schedule::IntoScheduleConfigs, system::SystemState}, prelude::{
         AssetApp, Button, Component, Entity, Plugin, PostUpdate, PreUpdate, Query, SystemSet, With,
-    },
-    ui::{
+    }, text::{TextColor, TextFont, TextSpan}, ui::{
         widget::{ImageNode, Text},
         BackgroundColor, ComputedNode, Interaction, Node,
-    },
+    }
 };
 
 use property::StyleSheetState;
@@ -135,6 +131,11 @@ impl Plugin for EcssPlugin {
             app.configure_sets(First, EcssHotReload.in_set(AssetEvents))
                 .add_systems(First, system::hot_reload_style_sheets.in_set(EcssHotReload));
         }
+
+        app.add_plugins((
+            HierarchyPropagatePlugin::<TextFont, Or<(With<Text>, With<TextSpan>)>>::default(),
+            HierarchyPropagatePlugin::<TextColor, Or<(With<Text>, With<TextSpan>)>>::default(),
+        ));
     }
 }
 

@@ -69,7 +69,6 @@ impl Property for AlphaProperty {
         cache: &Self::Cache,
         mut components: QueryItem<Self::Components>,
         _asset_server: &AssetServer,
-        _: &mut TextUiWriter,
         _commands: &mut Commands,
     ) {
         components.0.set_alpha(*cache);
