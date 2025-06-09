@@ -12,7 +12,7 @@ repository = "https://github.com/afonsolage/bevy_ecss"
 
 [dependencies]
 
-bevy = { path = "../bevy", default-features = false, features = [
+bevy = { version = "0.16", default-features = false, features = [
     "std",
     "bevy_log",
     "bevy_ui",
@@ -27,7 +27,7 @@ thiserror = "1.0.50"
 ahash = "*"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
-bevy = { path = "../bevy", default-features = false, features = [
+bevy = { version = "0.16", default-features = false, features = [
     "std",
     "bevy_log",
     "bevy_ui",
