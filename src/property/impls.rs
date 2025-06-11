@@ -246,8 +246,6 @@ mod style {
 
 /// Impls for `bevy_text` [`Text`] component
 mod text {
-    use bevy::app::Propagate;
-
     use super::*;
 
     /// Applies the `color` property on [`TextStyle::color`](`TextStyle`) field of all sections on matched [`Text`] components.
@@ -256,7 +254,7 @@ mod text {
 
     impl Property for FontColorProperty {
         type Cache = Color;
-        type Components = Entity;
+        type Components = &'static mut TextColor;
         type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
@@ -273,11 +271,11 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            entity: QueryItem<Self::Components>,
+            mut components: QueryItem<Self::Components>,
             _asset_server: &AssetServer,
-            commands: &mut Commands,
+            _commands: &mut Commands,
         ) {
-            commands.entity(entity).try_insert(Propagate(TextColor(*cache)));
+            components.0 = *cache;
         }
     }
 
@@ -287,7 +285,7 @@ mod text {
 
     impl Property for FontProperty {
         type Cache = String;
-        type Components = (Entity, &'static TextFont);
+        type Components = &'static mut TextFont;
         type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
@@ -304,11 +302,11 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            (entity, font): QueryItem<Self::Components>,
+            mut components: QueryItem<Self::Components>,
             asset_server: &AssetServer,
-            commands: &mut Commands,
+            _commands: &mut Commands,
         ) {
-            commands.entity(entity).try_insert(Propagate(font.clone().with_font(asset_server.load(cache))));
+            components.font = asset_server.load(cache);
         }
     }
 
@@ -318,7 +316,7 @@ mod text {
 
     impl Property for FontSizeProperty {
         type Cache = f32;
-        type Components = (Entity, &'static TextFont);
+        type Components = &'static mut TextFont;
         type Filters = With<ComputedNode>;
 
         fn name() -> &'static str {
@@ -335,11 +333,11 @@ mod text {
 
         fn apply<'w>(
             cache: &Self::Cache,
-            (entity, font): QueryItem<Self::Components>,
+            mut components: QueryItem<Self::Components>,
             _asset_server: &AssetServer,
-            commands: &mut Commands,
+            _commands: &mut Commands,
         ) {
-            commands.entity(entity).try_insert(Propagate(font.clone().with_font_size(*cache)));
+            components.font_size = *cache;
         }
     }
 
